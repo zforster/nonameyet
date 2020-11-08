@@ -1,10 +1,14 @@
-const server = require('http').createServer();
-const io = require('socket.io')(server, { origins: 'localhost:3000'});
+const app = require('express')();
+const http = require('http').createServer(app);
+const io = require('socket.io')(http);
+
+
 
 io.on('connection', (socket) => {
-    console.log("new client!");
-    socket.emit("welcome", "hello there");
+    console.log('a user connected');
+    socket.emit("welcome", "hello world!")
 });
 
-server.listen(4001, () => console.log("started"));
-
+http.listen(4000, () => {
+    console.log('listening on *:4000');
+});
