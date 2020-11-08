@@ -1,0 +1,26 @@
+{
+  "name": "rhymewithfriends",
+  "version": "1.0.0",
+  "description": "Rhyme with friends",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index",
+    "dev": "nodemon index"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zforster/nonameyet.git"
+  },
+  "author": "Zak",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/zforster/nonameyet/issues"
+  },
+  "homepage": "https://github.com/zforster/nonameyet#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "moment": "^2.29.1",
+    "nodemon": "^2.0.6",
+    "socket.io": "^3.0.0"
+  }
+}
