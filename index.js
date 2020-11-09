@@ -16,10 +16,15 @@ const io = require('socket.io')(http);
 // });
 
 io.of("/chat").on("connection", (socket) => {
-   socket.on("sendMsg", (data) => {
-      console.log(`${data.username}: ${data.msg}`);
-       socket.emit("broadcastMsg", data);// to just the client
-       socket.broadcast.emit("broadcastMsg", data);// to all but connected
+    socket.on("joinRoom", (room) => { // client sends join room emit
+        console.log(`client joining room: ${room}`);
+        socket.join(room);
+    });
+
+   socket.on("sendMsg", ({username, msg, room}) => {
+       console.log(`user ${username} in room ${room} sends: ${msg}`);
+       socket.emit("broadcastMsg", {username, msg, room});// to just the client
+       socket.to(room).emit("broadcastMsg", {username, msg, room});  // to all in the room
    });
 });
 
