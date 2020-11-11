@@ -2,18 +2,17 @@ const express = require('express');
 const app = express();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
+const axios = require('axios');
 
 
-// io.of("/games").on("connection", (socket) => {  // create namespace
-//
-//     socket.on("joinRoom", (room) => { // client sends join room emit
-//         console.log(`client joining room: ${room}`);
-//         socket.join(room);  // let client join room
-//         io.of("/games").in(room).emit("newUser", `new user is in your room ${room}`); // broadcast msg to games namespace use .to to broadcast to all but me, use .in to broadcast to all including me
-//         return socket.emit("success", `joined room ${room}`) // send client a msg
-//     });
-//
-// });
+function getRhymes(word) {
+    const promise = axios.get(`https://api.rhymezone.com/words?arhy=1&max=1000&qe=sl&sl=${word}`);
+    return promise.then((response) => response.data);
+}
+
+app.get('/', async (req, res) => {
+    getRhymes(req.query.word).then((r) => res.send(r));
+});
 
 io.of("/chat").on("connection", (socket) => {
     socket.on("joinRoom", (room) => { // client sends join room emit
