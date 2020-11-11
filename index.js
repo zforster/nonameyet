@@ -3,15 +3,17 @@ const app = express();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 const axios = require('axios');
+const randomWords = require('random-words');
 
 
-function getRhymes(word) {
+function getRhymes() {
+    const word = randomWords();
     const promise = axios.get(`https://api.rhymezone.com/words?arhy=1&max=1000&qe=sl&sl=${word}`);
     return promise.then((response) => response.data);
 }
 
 app.get('/', async (req, res) => {
-    getRhymes(req.query.word).then((r) => res.send(r));
+    getRhymes().then((r) => res.send(r));
 });
 
 io.of("/chat").on("connection", (socket) => {
