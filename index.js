@@ -4,7 +4,7 @@ const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 const axios = require('axios');
 const randomWords = require('random-words');
-
+let clients = [];
 
 function getRhymes() {
     const word = randomWords();
@@ -12,21 +12,29 @@ function getRhymes() {
     return promise.then((response) => response.data);
 }
 
-app.get('/', async (req, res) => {
-    getRhymes().then((r) => res.send(r));
-});
+// app.get('/', async (req, res) => {
+//     getRhymes().then((r) => res.send(r));
+// });
 
-io.of("/chat").on("connection", (socket) => {
-    socket.on("joinRoom", (room) => { // client sends join room emit
-        console.log(`client joining room: ${room}`);
+
+io.of("/games").on("connection", (socket) => {
+    socket.on("joinRoom", ({room, username}) => { // client sends join room emit
+        console.log(`${username} joined ${room}`);
+
+        socket["username"] = username;
+        clients.push(socket);
+
         socket.join(room);
+
+        socket.to(room).emit("userJoinedRoom", {username: socket["username"], id: socket.id});  // send the info of the user who just joined to everyone but the joiner
+        clients.forEach(client => {socket.emit("userJoinedRoom", {username: client["username"], id: client.id})});  // on join send emit usernames of everyone in the room to the client just joined
     });
 
-   socket.on("sendMsg", ({username, msg, room}) => {
-       console.log(`user ${username} in room ${room} sends: ${msg}`);
-       socket.emit("broadcastMsg", {username, msg, room});// to just the client
-       socket.to(room).emit("broadcastMsg", {username, msg, room});  // to all in the room
-   });
+   // socket.on("sendMsg", ({username, msg, room}) => {
+   //     console.log(`user ${username} in room ${room} sends: ${msg}`);
+   //     socket.emit("broadcastMsg", {username, msg, room});// to just the client
+   //     socket.to(room).emit("broadcastMsg", {username, msg, room});  // to all in the room
+   // });
 });
 
 http.listen(4000, () => {
