@@ -30,12 +30,12 @@ io.of("/games").on("connection", (socket) => {
         clients.forEach(c => {if(c["room"] === room){socket.emit("userJoinedRoom", {username: c["username"], id: c.id})}});  // on join send emit usernames of everyone in the room to the client just joined
     });
 
-    socket.on("leaveRoom", (room) => { // client sends join room emit
-        console.log(`${socket.username} leaving room ${room}`);
-        // socket.to(room).emit("userLeftRoom", {username: socket["username"], id: socket.id});
-        // clients = clients.filter(function(el){  // remove disconnecting client from list
-        //     return el.id !== socket.id;
-        // });
+    socket.on("disconnect", () => {
+        console.log(`${socket.username} leaving room ${socket.room}`);
+        socket.to(socket.room).emit("userLeftRoom", {username: socket["username"], id: socket.id});
+        clients = clients.filter(function(el){  // remove disconnecting client from list
+            return el.id !== socket.id;
+        });
     });
 
    // socket.on("sendMsg", ({username, msg, room}) => {
