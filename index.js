@@ -4,6 +4,7 @@ const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 const axios = require('axios');
 const randomWords = require('random-words');
+
 let clients = [];
 
 function getRhymes() {
@@ -18,8 +19,6 @@ function getRhymes() {
 
 io.of("/games").on("connection", (socket) => {
     socket.on("joinRoom", ({room, username}) => { // client sends join room emit
-        console.log(`${username} joined ${room}`);
-
         socket["username"] = username;
         socket["room"] = room;
         clients.push(socket);
@@ -31,20 +30,16 @@ io.of("/games").on("connection", (socket) => {
     });
 
     socket.on("disconnect", () => {
-        console.log(`${socket.username} leaving room ${socket.room}`);
         socket.to(socket.room).emit("userLeftRoom", {username: socket["username"], id: socket.id});
         clients = clients.filter(function(el){  // remove disconnecting client from list
             return el.id !== socket.id;
         });
     });
 
-   // socket.on("sendMsg", ({username, msg, room}) => {
-   //     console.log(`user ${username} in room ${room} sends: ${msg}`);
    //     socket.emit("broadcastMsg", {username, msg, room});// to just the client
    //     socket.to(room).emit("broadcastMsg", {username, msg, room});  // to all in the room
-   // });
 });
 
 http.listen(4000, () => {
-    console.log('listening on *:4000');
+    console.log('Server Started');
 });
