@@ -61,10 +61,12 @@ io.of("/games").on("connection", (socket) => {
     });
 
     socket.on("disconnect", () => {
-        socket.to(socket.room).emit("userLeftRoom", {username: socket["username"], id: socket.id});  // send new host in response
         clients = clients.filter(function(el){  // remove disconnecting client from list
             return el.id !== socket.id;
         });
+        let host = getRoomHost(socket.room);
+
+        socket.to(socket.room).emit("userLeftRoom", {username: socket["username"], id: socket.id, host: host["id"]});  // send new host in response
     });
 
    //     socket.emit("broadcastMsg", {username, msg, room});// to just the client
